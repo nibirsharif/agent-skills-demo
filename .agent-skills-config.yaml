@@ -1,0 +1,2 @@
+spec_output_dir: docs/specs
+test_command: python3 -m unittest
