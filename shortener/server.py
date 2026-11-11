@@ -2,6 +2,8 @@
 
 POST /links   body {"url": "https://..."}, header X-User: <owner>
               -> 201 {"code": "...", "url": "..."}
+GET  /links   header X-User: <owner>
+              -> 200 [{"code", "url", "expires_at", "click_count", "expired"}, ...]
 GET  /<code>  -> 302 to the long URL, or 404 if the code is unknown
 """
 
@@ -48,6 +50,8 @@ class Handler(BaseHTTPRequestHandler):
         self._send_json(201, {"code": code, "url": url})
 
     def do_GET(self):
+        if self.path == "/links":
+            return self._list_links()
         link = self.store.get(self.path.lstrip("/"))
         if link is None:
             return self._send_json(404, {"error": "not found"})
@@ -65,6 +69,16 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Location", link["url"])
         self.send_header("Content-Length", "0")
         self.end_headers()
+
+    def _list_links(self):
+        owner = self.headers.get("X-User", "").strip()
+        if not owner:
+            return self._send_json(401, {"error": "X-User header is required"})
+        now = datetime.now(timezone.utc).strftime(TIME_FORMAT)
+        links = self.store.list_by_owner(owner)
+        for link in links:
+            link["expired"] = link["expires_at"] <= now
+        self._send_json(200, links)
 
     def _send_json(self, status, payload):
         data = json.dumps(payload).encode()

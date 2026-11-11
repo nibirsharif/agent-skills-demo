@@ -125,7 +125,7 @@ The tasks build on the `shortener` package: store changes first in `shortener/st
 
 **Done when:** FR-005: server test that `GET /links` with `X-User: alice` returns only alice's links with expiry and click count; FR-007: server test that an expired link has its expired flag set and an unexpired link does not
 
-**Status:** Todo
+**Status:** Done
 
 #### T-2.3: Serve the page with the shortener prompt and the table
 

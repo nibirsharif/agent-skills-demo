@@ -130,6 +130,38 @@ class ServerTest(unittest.TestCase):
         self.assertEqual(response.status, 404)
         self.assertEqual(self.store.get(code)["click_count"], 2)
 
+    def test_list_links_returns_only_the_owners_links(self):
+        _, payload = self.create("https://example.com/a", "alice")
+        code_a = json.loads(payload)["code"]
+        self.create("https://example.com/b", "bob")
+        self.request("GET", "/" + code_a)
+        response, payload = self.request("GET", "/links", headers={"X-User": "alice"})
+        self.assertEqual(response.status, 200)
+        links = json.loads(payload)
+        self.assertEqual(len(links), 1)
+        self.assertEqual(links[0]["code"], code_a)
+        self.assertEqual(links[0]["url"], "https://example.com/a")
+        self.assertEqual(links[0]["click_count"], 1)
+        self.assertEqual(links[0]["expires_at"], self.store.get(code_a)["expires_at"])
+
+    def test_list_links_flags_expired_links(self):
+        _, payload = self.create("https://example.com/old")
+        old = json.loads(payload)["code"]
+        _, payload = self.create("https://example.com/new")
+        new = json.loads(payload)["code"]
+        with self.store._conn:
+            self.store._conn.execute(
+                "UPDATE links SET expires_at = '2000-01-01 00:00:00' WHERE code = ?",
+                (old,),
+            )
+        _, payload = self.request("GET", "/links", headers={"X-User": "alice"})
+        flags = {link["code"]: link["expired"] for link in json.loads(payload)}
+        self.assertEqual(flags, {old: True, new: False})
+
+    def test_list_links_without_user_is_rejected(self):
+        response, _ = self.request("GET", "/links")
+        self.assertEqual(response.status, 401)
+
     def test_unknown_code_returns_404(self):
         response, _ = self.request("GET", "/missing")
         self.assertEqual(response.status, 404)
