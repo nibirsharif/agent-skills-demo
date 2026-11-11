@@ -75,7 +75,7 @@ The tasks build on the `shortener` package: store changes first in `shortener/st
 
 **Done when:** FR-004: storage test that a new link has a click count of 0 and two calls of the increment method make it 2
 
-**Status:** Todo
+**Status:** Done
 
 #### T-1.6: Count each redirection
 

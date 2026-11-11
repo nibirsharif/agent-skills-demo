@@ -50,6 +50,13 @@ class LinkStoreTest(unittest.TestCase):
         code = self.store.create("https://example.com/a", "alice")
         self.assertEqual(self._hours_to_expiry(code), 720)
 
+    def test_new_link_has_0_clicks_and_two_increments_make_it_2(self):
+        code = self.store.create("https://example.com/a", "alice")
+        self.assertEqual(self.store.get(code)["click_count"], 0)
+        self.store.increment_clicks(code)
+        self.store.increment_clicks(code)
+        self.assertEqual(self.store.get(code)["click_count"], 2)
+
 
 if __name__ == "__main__":
     unittest.main()

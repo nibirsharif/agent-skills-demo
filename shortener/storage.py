@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS links (
     url TEXT NOT NULL,
     owner TEXT NOT NULL,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    expires_at TEXT
+    expires_at TEXT,
+    click_count INTEGER NOT NULL DEFAULT 0
 )
 """
 
@@ -36,6 +37,10 @@ class LinkStore:
                     "UPDATE links SET expires_at = "
                     "datetime(created_at, '+' || ? || ' days')",
                     (DEFAULT_EXPIRY_DAYS,),
+                )
+            if "click_count" not in columns:
+                self._conn.execute(
+                    "ALTER TABLE links ADD COLUMN click_count INTEGER NOT NULL DEFAULT 0"
                 )
 
     def create(self, url, owner, expires_in_days=None):
@@ -72,11 +77,24 @@ class LinkStore:
         """Return the link for a code as a dict, or None if unknown."""
         with self._lock:
             row = self._conn.execute(
-                "SELECT code, url, owner, expires_at FROM links WHERE code = ?", (code,)
+                "SELECT code, url, owner, expires_at, click_count FROM links WHERE code = ?", (code,)
             ).fetchone()
         if row is None:
             return None
-        return {"code": row[0], "url": row[1], "owner": row[2], "expires_at": row[3]}
+        return {
+            "code": row[0],
+            "url": row[1],
+            "owner": row[2],
+            "expires_at": row[3],
+            "click_count": row[4],
+        }
+
+    def increment_clicks(self, code):
+        """Add 1 to the click count of a link."""
+        with self._lock, self._conn:
+            self._conn.execute(
+                "UPDATE links SET click_count = click_count + 1 WHERE code = ?", (code,)
+            )
 
     def close(self):
         self._conn.close()
