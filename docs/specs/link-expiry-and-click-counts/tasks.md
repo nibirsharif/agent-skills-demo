@@ -173,7 +173,7 @@ The tasks build on the `shortener` package: store changes first in `shortener/st
 
 **Done when:** FR-005: README names the address of the page, and opening that address after `python3 -m shortener` shows the table
 
-**Status:** Todo
+**Status:** Done
 
 #### T-2.7: Verify the phase
 

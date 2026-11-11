@@ -15,6 +15,8 @@ curl -i -X POST localhost:8000/links -H 'X-User: alice' -d '{"url": "https://exa
 curl -i localhost:8000/<code>
 ```
 
+Open http://localhost:8000/ in a browser for the page with the shortener prompt and the table of links (with the default port; use the port you passed to `--port`).
+
 ## Run the tests
 
 ```bash
