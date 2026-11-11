@@ -33,7 +33,9 @@ async function loadLinks() {
     const row = tbody.insertRow();
     row.insertCell().textContent = link.code;
     row.insertCell().textContent = link.url;
-    row.insertCell().textContent = new Date(link.expires_at.replace(" ", "T") + "Z").toLocaleString();
+    row.insertCell().textContent = link.expired
+      ? "Expired"
+      : new Date(link.expires_at.replace(" ", "T") + "Z").toLocaleString();
     row.insertCell().textContent = link.click_count;
   }
 }

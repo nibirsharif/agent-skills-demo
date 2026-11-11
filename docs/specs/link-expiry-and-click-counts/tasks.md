@@ -149,7 +149,7 @@ The tasks build on the `shortener` package: store changes first in `shortener/st
 
 **Done when:** FR-007: in the browser, a link past its expiry shows "Expired" in the table and an unexpired link does not
 
-**Status:** Todo
+**Status:** Done
 
 #### T-2.5: Show the error message when the links cannot be loaded
 
