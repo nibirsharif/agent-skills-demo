@@ -76,6 +76,19 @@ class ServerTest(unittest.TestCase):
         _, payload = self.create("https://example.com")
         self.assertEqual(self.expiry_hours(json.loads(payload)["code"]), 720)
 
+    def test_create_with_invalid_expires_in_days_is_rejected(self):
+        for days in [0, -1, 1.5, "x"]:
+            with self.subTest(days=days):
+                response, _ = self.request(
+                    "POST",
+                    "/links",
+                    {"url": "https://example.com", "expires_in_days": days},
+                    {"X-User": "alice"},
+                )
+                self.assertEqual(response.status, 400)
+                count = self.store._conn.execute("SELECT COUNT(*) FROM links").fetchone()[0]
+                self.assertEqual(count, 0)
+
     def test_redirect_to_long_url(self):
         _, payload = self.create("https://example.com/page")
         code = json.loads(payload)["code"]

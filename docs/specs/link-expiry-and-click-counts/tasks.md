@@ -51,7 +51,7 @@ The tasks build on the `shortener` package: store changes first in `shortener/st
 
 **Done when:** FR-006: server test that `expires_in_days` values 0, -1, 1.5, and "x" each return 400 and create no link
 
-**Status:** Todo
+**Status:** Done
 
 #### T-1.4: Return 410 for an expired link
 

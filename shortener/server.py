@@ -34,7 +34,14 @@ class Handler(BaseHTTPRequestHandler):
         url = body.get("url") if isinstance(body, dict) else None
         if not is_valid_url(url):
             return self._send_json(400, {"error": "url must be an http or https URL"})
-        code = self.store.create(url, owner, body.get("expires_in_days"))
+        days = body.get("expires_in_days")
+        if days is not None and (
+            isinstance(days, bool) or not isinstance(days, int) or days < 1
+        ):
+            return self._send_json(
+                400, {"error": "expires_in_days must be a positive whole number"}
+            )
+        code = self.store.create(url, owner, days)
         self._send_json(201, {"code": code, "url": url})
 
     def do_GET(self):
