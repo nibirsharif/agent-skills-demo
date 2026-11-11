@@ -96,6 +96,21 @@ class ServerTest(unittest.TestCase):
         self.assertEqual(response.status, 302)
         self.assertEqual(response.getheader("Location"), "https://example.com/page")
 
+    def test_expired_link_returns_410_and_is_not_redirected(self):
+        _, payload = self.create("https://example.com/page")
+        code = json.loads(payload)["code"]
+        with self.store._conn:
+            self.store._conn.execute(
+                "UPDATE links SET expires_at = '2000-01-01 00:00:00' WHERE code = ?",
+                (code,),
+            )
+        response, body = self.request("GET", f"/{code}")
+        self.assertEqual(response.status, 410)
+        self.assertIsNone(response.getheader("Location"))
+        self.assertEqual(
+            body.decode(), "resource is permanently deleted and will not return"
+        )
+
     def test_unknown_code_returns_404(self):
         response, _ = self.request("GET", "/missing")
         self.assertEqual(response.status, 404)

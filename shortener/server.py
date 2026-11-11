@@ -7,7 +7,10 @@ GET  /<code>  -> 302 to the long URL, or 404 if the code is unknown
 
 import json
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from datetime import datetime, timezone
 from urllib.parse import urlparse
+
+from shortener.storage import TIME_FORMAT
 
 
 def is_valid_url(url):
@@ -48,6 +51,15 @@ class Handler(BaseHTTPRequestHandler):
         link = self.store.get(self.path.lstrip("/"))
         if link is None:
             return self._send_json(404, {"error": "not found"})
+        now = datetime.now(timezone.utc).strftime(TIME_FORMAT)
+        if link["expires_at"] <= now:
+            data = b"resource is permanently deleted and will not return"
+            self.send_response(410)
+            self.send_header("Content-Type", "text/plain")
+            self.send_header("Content-Length", str(len(data)))
+            self.end_headers()
+            self.wfile.write(data)
+            return
         self.send_response(302)
         self.send_header("Location", link["url"])
         self.send_header("Content-Length", "0")

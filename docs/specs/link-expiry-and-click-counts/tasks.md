@@ -63,7 +63,7 @@ The tasks build on the `shortener` package: store changes first in `shortener/st
 
 **Done when:** FR-001: server test that a link whose expiry instant has passed is no longer redirected; FR-003: server test that a request for it returns status 410 with the body `resource is permanently deleted and will not return`
 
-**Status:** Todo
+**Status:** Done
 
 #### T-1.5: Store a click count on each link
 
