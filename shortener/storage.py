@@ -89,6 +89,19 @@ class LinkStore:
             "click_count": row[4],
         }
 
+    def list_by_owner(self, owner):
+        """Return the links of an owner, expired ones included, as dicts."""
+        with self._lock:
+            rows = self._conn.execute(
+                "SELECT code, url, expires_at, click_count FROM links "
+                "WHERE owner = ? ORDER BY created_at, rowid",
+                (owner,),
+            ).fetchall()
+        return [
+            {"code": r[0], "url": r[1], "expires_at": r[2], "click_count": r[3]}
+            for r in rows
+        ]
+
     def increment_clicks(self, code):
         """Add 1 to the click count of a link."""
         with self._lock, self._conn:
