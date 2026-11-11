@@ -113,7 +113,7 @@ The tasks build on the `shortener` package: store changes first in `shortener/st
 
 **Done when:** FR-005: storage test that the new method returns only the given owner's links, expired ones included, each with code, URL, expiry, and click count
 
-**Status:** Done
+**Status:** Todo
 
 #### T-2.2: Add the endpoint that lists an owner's links
 
@@ -125,7 +125,7 @@ The tasks build on the `shortener` package: store changes first in `shortener/st
 
 **Done when:** FR-005: server test that `GET /links` with `X-User: alice` returns only alice's links with expiry and click count; FR-007: server test that an expired link has its expired flag set and an unexpired link does not
 
-**Status:** Done
+**Status:** Todo
 
 #### T-2.3: Serve the page with the shortener prompt and the table
 
@@ -137,7 +137,7 @@ The tasks build on the `shortener` package: store changes first in `shortener/st
 
 **Done when:** FR-005: server test that `GET /` returns 200 HTML; run `python3 -m shortener`, open `/` in a browser, and see the table below the prompt with each link's expiry date in the browser's time zone and its click count
 
-**Status:** Done
+**Status:** Todo
 
 #### T-2.4: Show "Expired" for an expired link in the table
 
@@ -149,7 +149,7 @@ The tasks build on the `shortener` package: store changes first in `shortener/st
 
 **Done when:** FR-007: in the browser, a link past its expiry shows "Expired" in the table and an unexpired link does not
 
-**Status:** Done
+**Status:** Todo
 
 #### T-2.5: Show the error message when the links cannot be loaded
 
@@ -161,7 +161,7 @@ The tasks build on the `shortener` package: store changes first in `shortener/st
 
 **Done when:** FR-008: in the browser, with the server stopped or `GET /links` failing, reloading the page shows "Could not load links"
 
-**Status:** Done
+**Status:** Todo
 
 #### T-2.6: Document the page address in the README
 
@@ -173,7 +173,7 @@ The tasks build on the `shortener` package: store changes first in `shortener/st
 
 **Done when:** FR-005: README names the address of the page, and opening that address after `python3 -m shortener` shows the table
 
-**Status:** Done
+**Status:** Todo
 
 #### T-2.7: Verify the phase
 
