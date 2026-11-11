@@ -39,7 +39,7 @@ The tasks build on the `shortener` package: store changes first in `shortener/st
 
 **Done when:** FR-001: server test that `POST /links` with `expires_in_days` 3 stores a link that expires 72 hours after creation; FR-002: server test that `POST /links` without it stores a link that expires 720 hours after creation
 
-**Status:** Todo
+**Status:** Done
 
 #### T-1.3: Reject an invalid expiry duration
 

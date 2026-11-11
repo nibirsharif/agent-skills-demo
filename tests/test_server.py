@@ -2,6 +2,7 @@ import http.client
 import json
 import threading
 import unittest
+from datetime import datetime
 
 from shortener.server import make_server
 from shortener.storage import LinkStore
@@ -52,6 +53,28 @@ class ServerTest(unittest.TestCase):
         conn.request("POST", "/links", body="nope", headers={"X-User": "alice"})
         self.assertEqual(conn.getresponse().status, 400)
         conn.close()
+
+    def expiry_hours(self, code):
+        created, expires = self.store._conn.execute(
+            "SELECT created_at, expires_at FROM links WHERE code = ?", (code,)
+        ).fetchone()
+        fmt = "%Y-%m-%d %H:%M:%S"
+        delta = datetime.strptime(expires, fmt) - datetime.strptime(created, fmt)
+        return delta.total_seconds() / 3600
+
+    def test_create_with_expires_in_days_expires_after_that_many_days(self):
+        response, payload = self.request(
+            "POST",
+            "/links",
+            {"url": "https://example.com", "expires_in_days": 3},
+            {"X-User": "alice"},
+        )
+        self.assertEqual(response.status, 201)
+        self.assertEqual(self.expiry_hours(json.loads(payload)["code"]), 72)
+
+    def test_create_without_expires_in_days_expires_after_720_hours(self):
+        _, payload = self.create("https://example.com")
+        self.assertEqual(self.expiry_hours(json.loads(payload)["code"]), 720)
 
     def test_redirect_to_long_url(self):
         _, payload = self.create("https://example.com/page")
