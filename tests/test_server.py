@@ -162,6 +162,12 @@ class ServerTest(unittest.TestCase):
         response, _ = self.request("GET", "/links")
         self.assertEqual(response.status, 401)
 
+    def test_root_serves_the_html_page(self):
+        response, payload = self.request("GET", "/")
+        self.assertEqual(response.status, 200)
+        self.assertIn("text/html", response.getheader("Content-Type"))
+        self.assertIn(b"<table", payload)
+
     def test_unknown_code_returns_404(self):
         response, _ = self.request("GET", "/missing")
         self.assertEqual(response.status, 404)

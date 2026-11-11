@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Link shortener</title>
+</head>
+<body>
+<h1>Link shortener</h1>
+<form id="prompt">
+  <label>User <input id="user" required></label>
+  <label>URL <input id="url" type="url" required></label>
+  <label>Expires in days <input id="days" type="number" min="1" step="1"></label>
+  <button type="submit">Shorten</button>
+</form>
+<p id="message"></p>
+<table id="links">
+  <thead><tr><th>Code</th><th>URL</th><th>Expires</th><th>Clicks</th></tr></thead>
+  <tbody></tbody>
+</table>
+<script>
+const user = document.getElementById("user");
+const tbody = document.querySelector("#links tbody");
+const message = document.getElementById("message");
+user.value = localStorage.getItem("user") || "";
+
+async function loadLinks() {
+  tbody.replaceChildren();
+  if (!user.value.trim()) return;
+  const response = await fetch("/links", {headers: {"X-User": user.value.trim()}});
+  const links = await response.json();
+  for (const link of links) {
+    const row = tbody.insertRow();
+    row.insertCell().textContent = link.code;
+    row.insertCell().textContent = link.url;
+    row.insertCell().textContent = new Date(link.expires_at.replace(" ", "T") + "Z").toLocaleString();
+    row.insertCell().textContent = link.click_count;
+  }
+}
+
+document.getElementById("prompt").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  localStorage.setItem("user", user.value.trim());
+  const body = {url: document.getElementById("url").value};
+  const days = document.getElementById("days").value;
+  if (days) body.expires_in_days = Number(days);
+  const response = await fetch("/links", {
+    method: "POST",
+    headers: {"X-User": user.value.trim()},
+    body: JSON.stringify(body),
+  });
+  const result = await response.json();
+  message.textContent = response.ok ? "Short code: " + result.code : result.error;
+  loadLinks();
+});
+
+user.addEventListener("change", loadLinks);
+loadLinks();
+</script>
+</body>
+</html>

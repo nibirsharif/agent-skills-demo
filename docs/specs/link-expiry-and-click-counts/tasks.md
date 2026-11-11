@@ -137,7 +137,7 @@ The tasks build on the `shortener` package: store changes first in `shortener/st
 
 **Done when:** FR-005: server test that `GET /` returns 200 HTML; run `python3 -m shortener`, open `/` in a browser, and see the table below the prompt with each link's expiry date in the browser's time zone and its click count
 
-**Status:** Todo
+**Status:** Done
 
 #### T-2.4: Show "Expired" for an expired link in the table
 
