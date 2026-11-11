@@ -87,7 +87,7 @@ The tasks build on the `shortener` package: store changes first in `shortener/st
 
 **Done when:** FR-004: server test that two redirects raise the click count from 0 to 2, and that a 410 response and a 404 response leave it unchanged
 
-**Status:** Todo
+**Status:** Done
 
 #### T-1.7: Verify the phase
 

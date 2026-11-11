@@ -111,6 +111,25 @@ class ServerTest(unittest.TestCase):
             body.decode(), "resource is permanently deleted and will not return"
         )
 
+    def test_redirects_are_counted_but_410_and_404_are_not(self):
+        _, payload = self.create("https://example.com/page")
+        code = json.loads(payload)["code"]
+        self.assertEqual(self.store.get(code)["click_count"], 0)
+        self.request("GET", f"/{code}")
+        self.request("GET", f"/{code}")
+        self.assertEqual(self.store.get(code)["click_count"], 2)
+        with self.store._conn:
+            self.store._conn.execute(
+                "UPDATE links SET expires_at = '2000-01-01 00:00:00' WHERE code = ?",
+                (code,),
+            )
+        response, _ = self.request("GET", f"/{code}")
+        self.assertEqual(response.status, 410)
+        self.assertEqual(self.store.get(code)["click_count"], 2)
+        response, _ = self.request("GET", "/missing")
+        self.assertEqual(response.status, 404)
+        self.assertEqual(self.store.get(code)["click_count"], 2)
+
     def test_unknown_code_returns_404(self):
         response, _ = self.request("GET", "/missing")
         self.assertEqual(response.status, 404)

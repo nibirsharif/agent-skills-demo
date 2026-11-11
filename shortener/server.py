@@ -60,6 +60,7 @@ class Handler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(data)
             return
+        self.store.increment_clicks(link["code"])
         self.send_response(302)
         self.send_header("Location", link["url"])
         self.send_header("Content-Length", "0")
