@@ -14,6 +14,7 @@
   <button type="submit">Shorten</button>
 </form>
 <p id="message"></p>
+<p id="load-error" role="alert"></p>
 <table id="links">
   <thead><tr><th>Code</th><th>URL</th><th>Expires</th><th>Clicks</th></tr></thead>
   <tbody></tbody>
@@ -22,13 +23,22 @@
 const user = document.getElementById("user");
 const tbody = document.querySelector("#links tbody");
 const message = document.getElementById("message");
+const loadError = document.getElementById("load-error");
 user.value = localStorage.getItem("user") || "";
 
 async function loadLinks() {
   tbody.replaceChildren();
+  loadError.textContent = "";
   if (!user.value.trim()) return;
-  const response = await fetch("/links", {headers: {"X-User": user.value.trim()}});
-  const links = await response.json();
+  let links;
+  try {
+    const response = await fetch("/links", {headers: {"X-User": user.value.trim()}});
+    if (!response.ok) throw new Error("status " + response.status);
+    links = await response.json();
+  } catch (error) {
+    loadError.textContent = "Could not load links";
+    return;
+  }
   for (const link of links) {
     const row = tbody.insertRow();
     row.insertCell().textContent = link.code;

@@ -161,7 +161,7 @@ The tasks build on the `shortener` package: store changes first in `shortener/st
 
 **Done when:** FR-008: in the browser, with the server stopped or `GET /links` failing, reloading the page shows "Could not load links"
 
-**Status:** Todo
+**Status:** Done
 
 #### T-2.6: Document the page address in the README
 
