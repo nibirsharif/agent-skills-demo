@@ -57,6 +57,24 @@ class LinkStoreTest(unittest.TestCase):
         self.store.increment_clicks(code)
         self.assertEqual(self.store.get(code)["click_count"], 2)
 
+    def test_list_by_owner_returns_only_that_owners_links_with_fields(self):
+        a = self.store.create("https://example.com/a", "alice", 3)
+        self.store.create("https://example.com/b", "bob")
+        expired = self.store.create("https://example.com/c", "alice")
+        self.store._conn.execute(
+            "UPDATE links SET expires_at = '2000-01-01 00:00:00' WHERE code = ?",
+            (expired,),
+        )
+        self.store.increment_clicks(a)
+        links = self.store.list_by_owner("alice")
+        self.assertEqual({l["code"] for l in links}, {a, expired})
+        by_code = {l["code"]: l for l in links}
+        self.assertEqual(by_code[a]["url"], "https://example.com/a")
+        self.assertEqual(by_code[a]["click_count"], 1)
+        self.assertEqual(by_code[a]["expires_at"], self.store.get(a)["expires_at"])
+        self.assertEqual(by_code[expired]["expires_at"], "2000-01-01 00:00:00")
+        self.assertEqual(self.store.list_by_owner("carol"), [])
+
 
 if __name__ == "__main__":
     unittest.main()

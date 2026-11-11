@@ -113,7 +113,7 @@ The tasks build on the `shortener` package: store changes first in `shortener/st
 
 **Done when:** FR-005: storage test that the new method returns only the given owner's links, expired ones included, each with code, URL, expiry, and click count
 
-**Status:** Todo
+**Status:** Done
 
 #### T-2.2: Add the endpoint that lists an owner's links
 
