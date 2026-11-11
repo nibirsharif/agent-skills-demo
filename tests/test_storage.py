@@ -1,4 +1,5 @@
 import unittest
+from datetime import datetime
 
 from shortener.codes import ALPHABET, CODE_LENGTH, new_code
 from shortener.storage import LinkStore
@@ -31,6 +32,30 @@ class LinkStoreTest(unittest.TestCase):
 
     def test_get_unknown_code_returns_none(self):
         self.assertIsNone(self.store.get("nope"))
+
+    def _hours_to_expiry(self, code):
+        created = self.store._conn.execute(
+            "SELECT created_at FROM links WHERE code = ?", (code,)
+        ).fetchone()[0]
+        expires = self.store.get(code)["expires_at"]
+        fmt = "%Y-%m-%d %H:%M:%S"
+        delta = datetime.strptime(expires, fmt) - datetime.strptime(created, fmt)
+        return delta.total_seconds() / 3600
+
+    def test_link_created_with_3_days_expires_72_hours_after_creation(self):
+        code = self.store.create("https://example.com/a", "alice", 3)
+        self.assertEqual(self._hours_to_expiry(code), 72)
+
+    def test_link_created_with_no_duration_expires_720_hours_after_creation(self):
+        code = self.store.create("https://example.com/a", "alice")
+        self.assertEqual(self._hours_to_expiry(code), 720)
+
+    def test_new_link_has_0_clicks_and_two_increments_make_it_2(self):
+        code = self.store.create("https://example.com/a", "alice")
+        self.assertEqual(self.store.get(code)["click_count"], 0)
+        self.store.increment_clicks(code)
+        self.store.increment_clicks(code)
+        self.assertEqual(self.store.get(code)["click_count"], 2)
 
 
 if __name__ == "__main__":
