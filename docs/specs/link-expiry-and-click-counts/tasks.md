@@ -99,7 +99,7 @@ The tasks build on the `shortener` package: store changes first in `shortener/st
 
 **Done when:** FR-001: T-1.1 and T-1.2 tests pass; FR-002: T-1.1 and T-1.2 tests pass; FR-003: T-1.4 test passes; FR-004: T-1.5 and T-1.6 tests pass; FR-006: T-1.3 test passes; `python3 -m unittest` is green
 
-**Status:** Todo
+**Status:** Done
 
 ### Phase 2: Single page webapp table of links
 
