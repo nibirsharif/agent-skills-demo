@@ -27,7 +27,7 @@ The tasks build on the `shortener` package: store changes first in `shortener/st
 
 **Done when:** FR-001: storage test that a link created with 3 days has an expiry exactly 72 hours after creation; FR-002: storage test that a link created with no duration has an expiry exactly 720 hours after creation
 
-**Status:** Todo
+**Status:** Done
 
 #### T-1.2: Accept an expiry duration when creating a link
 
